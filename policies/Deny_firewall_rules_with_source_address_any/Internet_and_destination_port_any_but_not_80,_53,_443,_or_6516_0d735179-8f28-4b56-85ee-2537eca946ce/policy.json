@@ -1,0 +1,104 @@
+{
+ "properties": {
+  "displayName": "Deny firewall rules with source address: any/Internet and destination port: any but not 80, 53, 443, or 6516",
+  "policyType": "Custom",
+  "mode": "All",
+  "description": "This policy denies the creation of inbound NSG 'allow' rules with:\n- 'Any' or 'Internet' as source addresses (except for destination port: 80, 53, 443, or 6516).\n- 'Any' as destination port",
+  "metadata": {
+   "category": "Network",
+   "createdBy": "815e048d-e9ad-443b-bfa6-1873ec81f9ac",
+   "createdOn": "2019-03-21T12:58:52.0966301Z",
+   "updatedBy": "815e048d-e9ad-443b-bfa6-1873ec81f9ac",
+   "updatedOn": "2021-04-20T09:12:44.5204279Z"
+  },
+  "parameters": {},
+  "policyRule": {
+   "if": {
+    "allOf": [
+     {
+      "field": "type",
+      "equals": "Microsoft.Network/networkSecurityGroups/securityRules"
+     },
+     {
+      "field": "Microsoft.Network/networkSecurityGroups/securityRules/access",
+      "equals": "Allow"
+     },
+     {
+      "field": "Microsoft.Network/networkSecurityGroups/securityRules/direction",
+      "equals": "Inbound"
+     },
+     {
+      "anyOf": [
+       {
+        "allOf": [
+         {
+          "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRange",
+          "equals": "*"
+         },
+         {
+          "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix",
+          "notIn": [
+           "AzureLoadBalancer"
+          ]
+         }
+        ]
+       },
+       {
+        "allOf": [
+         {
+          "not": {
+           "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRanges[*]",
+           "notEquals": "*"
+          }
+         },
+         {
+          "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix",
+          "notIn": [
+           "AzureLoadBalancer"
+          ]
+         }
+        ]
+       },
+       {
+        "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationAddressPrefix",
+        "in": [
+         "*",
+         "Internet",
+         "0.0.0.0/0"
+        ]
+       },
+       {
+        "allOf": [
+         {
+          "field": "Microsoft.Network/networkSecurityGroups/securityRules/sourceAddressPrefix",
+          "in": [
+           "*",
+           "Internet",
+           "0.0.0.0/0"
+          ]
+         },
+         {
+          "field": "Microsoft.Network/networkSecurityGroups/securityRules/destinationPortRange",
+          "notIn": [
+           "80",
+           "80,443",
+           "53",
+           "443",
+           "6516"
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "then": {
+    "effect": "deny"
+   }
+  }
+ },
+ "id": "/providers/Microsoft.Management/managementGroups/All_Subscriptions/providers/Microsoft.Authorization/policyDefinitions/0d735179-8f28-4b56-85ee-2537eca946ce",
+ "type": "Microsoft.Authorization/policyDefinitions",
+ "name": "0d735179-8f28-4b56-85ee-2537eca946ce"
+}
